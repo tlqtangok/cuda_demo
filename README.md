@@ -18,7 +18,11 @@ make clean
 ```
 to try. the **PROJECT_NAME** is one of 
 
-> DEFINE_I_J_K_i_j_k_idx  clear_matrix_edge  split_tid  try_idx  verify_nvcc_env
+- verify_nvcc_env
+- try_idx  
+- split_tid  
+- DEFINE_I_J_K_i_j_k_idx  
+- clear_matrix_edge  
 
 enjoy yourself :)
 
