@@ -5,16 +5,25 @@ cuda guide for new comers.
 
 # to use 
 `cd cuda_demo/cuda_demo/0_Simple/`
-you will see the project name below. 
+you will see many project names. 
+
 use :
+
 ```
+cd cuda_demo/cuda_demo/0_Simple/PROJECT_NAME
 make 
 make run 
 make clean 
 
 ```
-to try.  enjoy yourself :)
+to try. the **PROJECT_NAME** is one of 
 
+> DEFINE_I_J_K_i_j_k_idx  clear_matrix_edge  split_tid  try_idx  verify_nvcc_env
+
+enjoy yourself :)
+
+
+# the meaning of each project.
 
 ## verify_nvcc_env
 verify if nvcc is ready. make sure you "nvcc -V" can work properly.
