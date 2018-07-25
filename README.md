@@ -31,7 +31,7 @@ enjoy yourself :)
 
 - **verify_nvcc_env**
 
-verify if nvcc is ready. make sure you "nvcc -V" can work properly.
+  verify if nvcc is ready. make sure you "nvcc -V" can work properly.
 
 
 - **try_idx**
