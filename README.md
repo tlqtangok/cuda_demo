@@ -51,7 +51,7 @@ enjoy yourself :)
   how to use the idx to do some computing job.
 
 
-
+  
 - **clear_matrix_edge**
 
   a real example of using cuda to do matrix transformation.
@@ -59,4 +59,5 @@ enjoy yourself :)
 
 
 
-
+# extra article
+please see [NVIDIA CUDA 入门与并行优化建议](https://gitbook.cn/gitchat/activity/5b49ecf81f72d149b2ded0b0)
