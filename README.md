@@ -10,11 +10,10 @@ you will see many project names.
 use :
 
 ```
-cd cuda_demo/cuda_demo/0_Simple/PROJECT_NAME
+cd cuda_demo/cuda_demo/0_Simple/PROJECT_NAME/
 make 
 make run 
 make clean 
-
 ```
 to try. the **PROJECT_NAME** is one of 
 
@@ -34,9 +33,11 @@ enjoy yourself :)
   verify if nvcc is ready. make sure you "nvcc -V" can work properly.
 
 
+
 - **try_idx**
 
   try if you can see the idx number from multi-thread.
+
 
 
 - **DEFINE_I_J_K_i_j_k_idx**
@@ -44,9 +45,11 @@ enjoy yourself :)
   about how to figure out the idx.
 
 
+
 - **split_tid**
 
   how to use the idx to do some computing job.
+
 
 
 - **clear_matrix_edge**
