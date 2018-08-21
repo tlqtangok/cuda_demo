@@ -35,6 +35,14 @@
 
 # Location of the CUDA Toolkit
 #CUDA_PATH ?= "/usr/local/cuda-9.2"
+
+shell_which_nvcc ?= $(shell basename `which nvcc`)
+
+ifneq ($(shell_which_nvcc) , nvcc)
+	$(error - no nvcc found in path)
+endif
+
+
 CUDA_PATH ?= $(shell dirname `dirname \`which nvcc\``)
 FILENAME_NO_SUFFIX ?= $(shell basename `pwd`)
 ##############################
@@ -302,3 +310,4 @@ clean:
 	rm -rf ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)/$(FILENAME_NO_SUFFIX)
 
 clobber: clean
+
