@@ -121,13 +121,54 @@ __global__ void test(cudaTextureObject_t tex)
 }
 
 
+
+
+texture<float, 1, cudaReadModeElementType> tex1;
+__global__ void test1()
+{
+
+    DEFINE_J_j_idx;
+
+    printf("%d : %f\n", idx, tex1Dfetch(tex1, idx));
+
+}
+
 // main__ 
 int main(int argc, char **argv)
 {
 
+#if 1 //simple bind texture
+
+    dim3 g_(rows, 1, 1);
+    dim3 b_(cols, 1, 1);
+
+    float *buffer;
+    cudaMallocManaged(&buffer, rows * cols * sizeof(float));
 
 
-#if 1
+    for (int i = 0; i < rows * cols; i++)
+    {
+        buffer[i] = i*0.1f;
+
+    }
+   
+    cudaBindTexture(0, tex1, buffer, rows * cols * sizeof(float));
+
+    buffer[2] = 222.222;
+
+    test1 << <g_, b_ >> >();
+
+
+    CUDA_CHECK_RETURN(cudaDeviceSynchronize());
+
+    cudaUnbindTexture(tex1);
+
+
+#endif 
+
+
+
+#if 0 
     dim3 g_(rows, 1, 1);
     dim3 b_(cols, 1, 1);
 
@@ -166,10 +207,13 @@ int main(int argc, char **argv)
     cudaDestroyTextureObject(tex);
 #endif 
 
+
+
+
+
+
 	__P__;
 }
-
-
 
 
 
