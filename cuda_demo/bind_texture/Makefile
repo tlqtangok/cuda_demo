@@ -35,12 +35,12 @@
 
 # Location of the CUDA Toolkit
 #CUDA_PATH ?= "/usr/local/cuda-9.2"
-
 shell_which_nvcc ?= $(shell basename `which nvcc`)
 
 ifneq ($(shell_which_nvcc) , nvcc)
-	$(error - no nvcc found in path)
+$(error - no nvcc found in path)
 endif
+
 
 
 CUDA_PATH ?= $(shell dirname `dirname \`which nvcc\``)
@@ -251,14 +251,14 @@ ALL_LDFLAGS += $(addprefix -Xlinker ,$(LDFLAGS))
 ALL_LDFLAGS += $(addprefix -Xlinker ,$(EXTRA_LDFLAGS))
 
 # Common includes and paths for CUDA
-INCLUDES  := -I../../common/inc
+INCLUDES  := -I../dep/common/inc
 LIBRARIES :=
 
 ################################################################################
 
 # Gencode arguments
 #SMS ?= 30 35 37 50 52 60 61 70
-SMS ?= 61
+SMS ?= 60
 
 ifeq ($(SMS),)
 $(info >>> WARNING - no SM architectures have been specified - waiving sample <<<)
@@ -299,15 +299,15 @@ $(FILENAME_NO_SUFFIX).o:$(FILENAME_NO_SUFFIX).cu Makefile
 
 $(FILENAME_NO_SUFFIX): $(FILENAME_NO_SUFFIX).o
 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
-	$(EXEC) mkdir -p ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
-	$(EXEC) cp $@ ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
+	$(EXEC) mkdir -p ../dep/bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
+	$(EXEC) cp $@ ../dep/bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
 
 run: build
 	@$(EXEC) ./$(FILENAME_NO_SUFFIX)
 
 clean:
 	rm -f $(FILENAME_NO_SUFFIX) $(FILENAME_NO_SUFFIX).o
-	rm -rf ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)/$(FILENAME_NO_SUFFIX)
+	@rm -rf ../dep/bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)/$(FILENAME_NO_SUFFIX)
+	rm -rf ../dep/bin
 
 clobber: clean
-

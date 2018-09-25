@@ -31,6 +31,11 @@
 #include <iostream>
 #include <numeric>
 #include <stdlib.h>
+#include <unordered_map>
+#include <cfloat>
+#include <unordered_map>
+#include <map>
+
 
 
 // jd add
@@ -93,24 +98,38 @@ static void CheckCudaErrorAux(const char *file, unsigned line, const char *state
 using namespace std; 
 // jd end 
 
-static const int rows = 4; 
+
+// jd add 
+
+
+#if 1 
+static const int rows = 6;
 static const int cols = 5;
+#endif 
 
 
 
-__global__ void testk(int *arr_gpu_a, int sz_bytes)
+
+
+__global__ void test(cudaTextureObject_t tex)
 {
+
+    DEFINE_J_j_idx; 
+
+    printf("%d : %f\n", idx, tex1Dfetch<float>(tex, idx));
+
+}
+
+
+
+
+texture<float, 1, cudaReadModeElementType> tex1;
+__global__ void test1()
+{
+
     DEFINE_J_j_idx;
 
-
-	if(_J == _COLS - 1 || _J == 0 || _j == _cols - 1 || _j == 0)
-	{
-		arr_gpu_a[idx] = 0; 
-	}
-	else
-	{
-		arr_gpu_a[idx] += 1; 
-	}
+    printf("%d : %f\n", idx, tex1Dfetch(tex1, idx));
 
 }
 
@@ -118,60 +137,84 @@ __global__ void testk(int *arr_gpu_a, int sz_bytes)
 int main(int argc, char **argv)
 {
 
-	// jd add 
-	const int sz_bytes = rows * cols * sizeof(int); 
-	int *arr_cpu_a = (int*)malloc(sz_bytes);
+#if 1 //simple bind texture
+
+    dim3 g_(rows, 1, 1);
+    dim3 b_(cols, 1, 1);
+
+    float *buffer;
+    cudaMallocManaged(&buffer, rows * cols * sizeof(float));
 
 
-	cout << "- before gpu process..." << endl; 
-	for(int i=0;i<rows;i++)
-	{
-		int first_v = 2; 
-		for(int j=0;j<cols;j++)
-		{
-			auto &v = 		arr_cpu_a[i*cols+j];
-			v = first_v; 
-			printf("%3d ", v);; 
-			first_v++; 
-		}
-		cout << endl; 
-	}
+    for (int i = 0; i < rows * cols; i++)
+    {
+        buffer[i] = i*0.1f;
 
-	cout << endl; 
+    }
+   
+    cudaBindTexture(0, tex1, buffer, rows * cols * sizeof(float));
+
+    buffer[2] = 222.222;
+
+    test1 << <g_, b_ >> >();
 
 
-	int* arr_gpu_a = NULL;
-	cudaMalloc((void **)&arr_gpu_a, sz_bytes);
+    CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 
-	cudaMemcpy(arr_gpu_a, arr_cpu_a, sz_bytes, cudaMemcpyHostToDevice);
-
-	dim3 grid_(rows, 1, 1);
-	dim3 block_(cols, 1, 1);
-	testk << <grid_, block_ >> >(arr_gpu_a, sz_bytes);
-
-	cudaMemcpy(arr_cpu_a, arr_gpu_a, sz_bytes, cudaMemcpyDeviceToHost);
-
-	cout << "- after gpu process..." << endl; 
-
-	for(int i=0;i<rows;i++)
-	{
-		//int first_v = 2; 
-		for(int j=0;j<cols;j++)
-		{
-			auto &v = 		arr_cpu_a[i*cols+j];
-			//v = first_v; 
-			printf("%3d ", v);; 
-			//first_v++; 
-		}
-		cout << endl; 
-	}
+    cudaUnbindTexture(tex1);
 
 
-	cudaFree(arr_gpu_a); 
-	free(arr_cpu_a); 
+#endif 
 
 
-	// jd end 
+
+#if 0 
+    dim3 g_(rows, 1, 1);
+    dim3 b_(cols, 1, 1);
+
+    float *buffer;
+    cudaMallocManaged(&buffer, rows * cols * sizeof(float));
+
+
+    for (int i = 0; i < rows * cols; i++)
+    {
+        buffer[i] = i*0.1f;
+    }
+
+    // create texture object
+    cudaResourceDesc resDesc;
+    memset(&resDesc, 0, sizeof(resDesc));
+    resDesc.resType = cudaResourceTypeLinear;
+    resDesc.res.linear.devPtr = buffer;
+    resDesc.res.linear.desc.f = cudaChannelFormatKindFloat;
+    resDesc.res.linear.desc.x = 32; // bits per channel
+    resDesc.res.linear.sizeInBytes = rows * cols * sizeof(float);
+
+    cudaTextureDesc texDesc;
+    memset(&texDesc, 0, sizeof(texDesc));
+    texDesc.readMode = cudaReadModeElementType;
+
+    // create texture object: we only have to do this once!
+    cudaTextureObject_t tex = 0;
+    cudaCreateTextureObject(&tex, &resDesc, &texDesc, NULL);
+
+
+	buffer[2] = 333.333;  // still can work !!! 
+
+    test << <g_, b_ >> >(tex);
+    CUDA_CHECK_RETURN(cudaDeviceSynchronize());
+
+    cudaDestroyTextureObject(tex);
+#endif 
+
+
+
+
+
 
 	__P__;
 }
+
+
+
+

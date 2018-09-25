@@ -31,11 +31,6 @@
 #include <iostream>
 #include <numeric>
 #include <stdlib.h>
-#include <unordered_map>
-#include <cfloat>
-#include <unordered_map>
-#include <map>
-
 
 
 // jd add
@@ -98,80 +93,95 @@ static void CheckCudaErrorAux(const char *file, unsigned line, const char *state
 using namespace std; 
 // jd end 
 
-
-// jd add 
-
-
-#if 1 
-static const int rows = 6;
+static const int rows = 4; 
 static const int cols = 5;
-#endif 
 
 
 
-
-
-__global__ void test(cudaTextureObject_t tex)
+__global__ void testk(int *arr_gpu_a, int sz_bytes)
 {
+	DEFINE_J_j_idx;
 
-    DEFINE_J_j_idx; 
 
-    printf("%d : %f\n", idx, tex1Dfetch<float>(tex, idx));
+	if(_J == _COLS - 1 || _J == 0 || _j == _cols - 1 || _j == 0)
+	{
+		arr_gpu_a[idx] = 0; 
+	}
+	else
+	{
+		arr_gpu_a[idx] += 1; 
+	}
+
+	for(int i=0;i<1e6;i++)
+	{
+		for(int j=0;j<1e3;j++)
+		{
+			int t =99; 
+			t+=1; 
+		}	
+	}
 
 }
-
 
 // main__ 
 int main(int argc, char **argv)
 {
 
+	// jd add 
+	const int sz_bytes = rows * cols * sizeof(int); 
+	int *arr_cpu_a = (int*)malloc(sz_bytes);
 
 
-#if 1
-    dim3 g_(rows, 1, 1);
-    dim3 b_(cols, 1, 1);
+	cout << "- before gpu process..." << endl; 
+	for(int i=0;i<rows;i++)
+	{
+		int first_v = 2; 
+		for(int j=0;j<cols;j++)
+		{
+			auto &v = 		arr_cpu_a[i*cols+j];
+			v = first_v; 
+			printf("%3d ", v);; 
+			first_v++; 
+		}
+		cout << endl; 
+	}
 
-    float *buffer;
-    cudaMallocManaged(&buffer, rows * cols * sizeof(float));
-
-
-    for (int i = 0; i < rows * cols; i++)
-    {
-        buffer[i] = i*0.1f;
-    }
-
-    // create texture object
-    cudaResourceDesc resDesc;
-    memset(&resDesc, 0, sizeof(resDesc));
-    resDesc.resType = cudaResourceTypeLinear;
-    resDesc.res.linear.devPtr = buffer;
-    resDesc.res.linear.desc.f = cudaChannelFormatKindFloat;
-    resDesc.res.linear.desc.x = 32; // bits per channel
-    resDesc.res.linear.sizeInBytes = rows * cols * sizeof(float);
-
-    cudaTextureDesc texDesc;
-    memset(&texDesc, 0, sizeof(texDesc));
-    texDesc.readMode = cudaReadModeElementType;
-
-    // create texture object: we only have to do this once!
-    cudaTextureObject_t tex = 0;
-    cudaCreateTextureObject(&tex, &resDesc, &texDesc, NULL);
+	cout << endl; 
 
 
-	buffer[2] = 333.333;  // still can work !!! 
+	int* arr_gpu_a = NULL;
+	CUDA_CHECK_RETURN( cudaMalloc((void **)&arr_gpu_a, sz_bytes) );
 
-    test << <g_, b_ >> >(tex);
-    CUDA_CHECK_RETURN(cudaDeviceSynchronize());
+	CUDA_CHECK_RETURN( cudaMemcpy(arr_gpu_a, arr_cpu_a, sz_bytes, cudaMemcpyHostToDevice) );
 
-    cudaDestroyTextureObject(tex);
-#endif 
+	dim3 grid_(rows, 1, 1);
+	dim3 block_(cols, 1, 1);
+
+	testk << <grid_, block_ >> >(arr_gpu_a, sz_bytes);
+
+	CUDA_CHECK_RETURN( cudaDeviceSynchronize() );
+	CUDA_CHECK_RETURN( cudaMemcpy(arr_cpu_a, arr_gpu_a, sz_bytes, cudaMemcpyDeviceToHost) );
+
+	cout << "- after gpu process..." << endl; 
+	for(int i=0;i<rows;i++)
+	{
+		//int first_v = 2; 
+		for(int j=0;j<cols;j++)
+		{
+			auto &v = 		arr_cpu_a[i*cols+j];
+			//v = first_v; 
+			printf("%3d ", v);; 
+			//first_v++; 
+		}
+		cout << endl; 
+	}
+
+
+	CUDA_CHECK_RETURN( cudaFree(arr_gpu_a) ); 
+	free(arr_cpu_a); 
+
+
+	// jd end 
 
 	__P__;
 }
-
-
-
-
-
-
-
