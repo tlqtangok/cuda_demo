@@ -104,7 +104,7 @@ __global__ void testk_no_extern(int *arr_gpu_a, int sz)
 	//printf("- %d %d %d,  %d %d %d\n",  _J, _I,_K,  _j, _i, _k);
 
 	__shared__ int s_arr[1];
-	
+
 	if(idx % cols == 0)
 	{
 		memset(s_arr, 0, sizeof(int) * 1); 
@@ -122,7 +122,6 @@ __global__ void testk_no_extern(int *arr_gpu_a, int sz)
 	{
 		printf("%d\n", s_arr[0]); 
 	}
-	__syncthreads();
 }
 
 __global__ void testk_extern(int *arr_gpu_a, int sz)
@@ -149,19 +148,17 @@ __global__ void testk_extern(int *arr_gpu_a, int sz)
 	{
 		printf("%d\n", s_arr[0]); 
 	}
-	__syncthreads(); 
-
 }
 
 // main__ 
 int main(int argc, char **argv)
 {
 
-    // jd add 
+	// jd add 
 
 
-    //float* arr_gpu_a = NULL;
-    //cudaMalloc((void **)&arr_gpu_a, sizeof(float));
+	//float* arr_gpu_a = NULL;
+	//cudaMalloc((void **)&arr_gpu_a, sizeof(float));
 
 	int *arr_gpu_a = NULL; 
 	CUDA_CHECK_RETURN(cudaMallocManaged((void**)&arr_gpu_a, rows * cols * sizeof(int))); 
@@ -173,15 +170,15 @@ int main(int argc, char **argv)
 	}
 #endif 
 
-    dim3 grid_(rows, 1, 1);
-    dim3 block_(cols, 1, 1);
+	dim3 grid_(rows, 1, 1);
+	dim3 block_(cols, 1, 1);
 
 
 
 
 
 #if 1 
-    testk_no_extern<< <grid_, block_>> >(arr_gpu_a, rows * cols);
+	testk_no_extern<< <grid_, block_>> >(arr_gpu_a, rows * cols);
 	CUDA_CHECK_RETURN(cudaDeviceSynchronize());
 #endif
 	cout << "-------- testk_no_extern -------" << endl; 
@@ -192,9 +189,9 @@ int main(int argc, char **argv)
 #endif 
 	cout << "---------- testk_extern --------" << endl; 
 
-    CUDA_CHECK_RETURN(cudaFree(arr_gpu_a)); 
+	CUDA_CHECK_RETURN(cudaFree(arr_gpu_a)); 
 
-    // jd end 
+	// jd end 
 
-    __P__;
+	__P__;
 }
