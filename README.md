@@ -23,6 +23,9 @@ to try. the **PROJECT_NAME** is one of
 - DEFINE_I_J_K_i_j_k_idx  
 - clear_matrix_edge  
 - bind_texture
+- shared_memory
+- shared_memory_merge
+
 
 enjoy yourself :)
 
@@ -57,7 +60,13 @@ enjoy yourself :)
 
   a real example of using cuda to do matrix transformation.
 
+- `shared_memory`
 
+  usage of shared memory. very simple usage. no recommend
+
+- `shared_memory_merge`
+
+  to sum an array on shared memory
 
 
 # extra article
