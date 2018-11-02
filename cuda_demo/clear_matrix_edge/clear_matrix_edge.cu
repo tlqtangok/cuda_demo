@@ -112,15 +112,6 @@ __global__ void testk(int *arr_gpu_a, int sz_bytes)
 		arr_gpu_a[idx] += 1; 
 	}
 
-	for(int i=0;i<1e6;i++)
-	{
-		for(int j=0;j<1e3;j++)
-		{
-			int t =99; 
-			t+=1; 
-		}	
-	}
-
 }
 
 // main__ 
