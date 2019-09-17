@@ -93,8 +93,9 @@ static void CheckCudaErrorAux(const char *file, unsigned line, const char *state
 using namespace std; 
 // jd end 
 
-static const int rows = 4; 
-static const int cols = 5;
+static const int rows = 3; 
+static const int cols = 4;
+static const bool flag_debug = 0; 
 
 
 
@@ -111,6 +112,7 @@ __global__ void testk(int *arr_gpu_a, int sz_bytes)
 	{
 		arr_gpu_a[idx] += 1; 
 	}
+	//for(int i=0;i<100000;i++) arr_gpu_a[idx]+=1; 
 
 }
 
@@ -131,10 +133,11 @@ int main(int argc, char **argv)
 		{
 			auto &v = 		arr_cpu_a[i*cols+j];
 			v = first_v; 
-			printf("%3d ", v);; 
+
+			flag_debug  && printf("%3d ", v);; 
 			first_v++; 
 		}
-		cout << endl; 
+		flag_debug && cout << endl; 
 	}
 
 	cout << endl; 
@@ -161,10 +164,10 @@ int main(int argc, char **argv)
 		{
 			auto &v = 		arr_cpu_a[i*cols+j];
 			//v = first_v; 
-			printf("%3d ", v);; 
+			flag_debug && printf("%3d ", v);; 
 			//first_v++; 
 		}
-		cout << endl; 
+		flag_debug && cout << endl; 
 	}
 
 
